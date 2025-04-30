@@ -1,8 +1,7 @@
 package tests
 
 import (
-	"bytes"
-	"encoding/json"
+	"clonecoding/internal/dto"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -12,28 +11,27 @@ import (
 func TestCreateUser(t *testing.T) {
 	r := SetupTestEnv()
 
-	requestBody := map[string]string{
-		"email":    "qwe@asd.zxc",
-		"name":     "qaz",
-		"password": "wasd",
+	users := GetTestUser()
+
+	for _, user := range users {
+		t.Run("Create"+user.Name, func(t *testing.T) {
+			res := CreateUser(r, &user)
+
+			if res.Code != http.StatusOK {
+				t.Errorf("Eprected status 200, got %v", res.Code)
+			}
+		})
 	}
-
-	jsonValue, _ := json.Marshal(requestBody)
-
-	req, _ := http.NewRequest("POST", "/create", bytes.NewBuffer(jsonValue))
-	req.Header.Set("Content-Type", "application/json")
-
-	res := httptest.NewRecorder()
-	r.ServeHTTP(res, req)
-
-	if res.Code != http.StatusOK {
-		t.Errorf("Eprected status 200, got %v", res.Code)
-	}
-	fmt.Println(res)
 }
 
 func TestLoginCases(t *testing.T) {
-	router := SetupTestEnv()
+	r := SetupTestEnv()
+
+	users := GetTestUser()
+
+	for _, user := range users {
+		CreateUser(r, &user)
+	}
 
 	tests := []struct {
 		name         string
@@ -41,7 +39,7 @@ func TestLoginCases(t *testing.T) {
 		password     string
 		expectStatus int
 	}{
-		{"Success Login", "qwe@asd.zxc", "wasd", http.StatusOK},
+		{"Success Login", users[0].Email, users[0].Password, http.StatusOK},
 		{"Wrong Password", "qwe@asd.zxc", "wrongpassword", http.StatusInternalServerError},
 		{"Missing Email", "", "wasd", http.StatusBadRequest},
 		{"Missing passord", "qwe@asd.zxc", "", http.StatusBadRequest},
@@ -50,17 +48,12 @@ func TestLoginCases(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			body := map[string]string{
-				"email":    tc.email,
-				"password": tc.password,
+			loginReq := dto.LoginRequest{
+				Email:    tc.email,
+				Password: tc.password,
 			}
-			jsonBody, _ := json.Marshal(body)
 
-			req, _ := http.NewRequest("POST", "/auth/login", bytes.NewBuffer(jsonBody))
-			req.Header.Set("Content-Type", "application/json")
-			res := httptest.NewRecorder()
-
-			router.ServeHTTP(res, req)
+			res := Login(r, &loginReq)
 
 			if res.Code != tc.expectStatus {
 				t.Errorf("[%s] Expected %d, got %d", tc.name, tc.expectStatus, res.Code)
@@ -74,9 +67,23 @@ func TestLoginCases(t *testing.T) {
 func TestGetUserWithValidToken(t *testing.T) {
 	r := SetupTestEnv()
 
-	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIzYzQzZTA3Mi02MGFlLTQzZWYtYTg3NS0xYjU0ZjlkZjcwNTciLCJleHAiOjE3NDYwMjAwMDEsImlhdCI6MTc0NTkzMzYwMX0.bE9ilQC2uNZTpi55TwEHvoHcPM38l6IF4KcXcuHH2X0"
+	users := GetTestUser()
+	CreateUser(r, &users[0])
+	loginReq := dto.LoginRequest{
+		Email:    users[0].Email,
+		Password: users[0].Password,
+	}
+	loginRes := Login(r, &loginReq)
+	loginResParse := ParseResponse(t, loginRes)
+	dataOrig := loginResParse.Data
+	data, _ := dataOrig.(map[string]any)
+	tokenOrig := data["access_token"]
+	token, _ := tokenOrig.(string)
+	fmt.Println(token)
 
-	req, _ := http.NewRequest("GET", "/user", nil)
+	token = "Bearer " + token
+
+	req, _ := http.NewRequest("GET", "/user/", nil)
 	req.Header.Set("Authorization", token)
 
 	res := httptest.NewRecorder()

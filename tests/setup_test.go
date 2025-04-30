@@ -9,15 +9,12 @@ import (
 	"clonecoding/internal/adapter/jwt"
 	"clonecoding/internal/domain"
 	"clonecoding/internal/usecase"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupTestEnv() *gin.Engine {
 	gin.SetMode(gin.TestMode)
-
-	os.Chdir("..")
 
 	config.LoadConfig()
 
