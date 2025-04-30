@@ -21,6 +21,6 @@ func InitDatabase() {
 	}
 }
 
-func InitScheme(model interface{}) error {
+func InitScheme(model any) error {
 	return database.AutoMigrate(&model)
 }
