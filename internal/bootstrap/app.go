@@ -1,12 +1,11 @@
 package bootstrap
 
 import (
-	"clonecoding/config"
-	database "clonecoding/database"
-	userDatabase "clonecoding/internal/adapter/database"
+	"clonecoding/internal/adapter/database"
 	"clonecoding/internal/adapter/hashing"
 	"clonecoding/internal/adapter/http"
 	"clonecoding/internal/adapter/jwt"
+	"clonecoding/internal/config"
 	"clonecoding/internal/domain"
 	"clonecoding/internal/router"
 	"clonecoding/internal/usecase"
@@ -30,8 +29,8 @@ func InitApp() *App {
 
 	jwtService := &jwt.JWTServiceImpl{SecretKey: []byte(config.JWTSecret)}
 
-	userRepo := &userDatabase.UserRepositoryImpl{DB: db}
-	authRepo := &userDatabase.AuthRepositoryImpl{DB: db}
+	userRepo := &database.UserRepositoryImpl{DB: db}
+	authRepo := &database.AuthRepositoryImpl{DB: db}
 
 	userUseCase := &usecase.UserUsecase{UserRepo: userRepo, Hashing: hashing}
 	authUsecase := &usecase.AuthUseCase{UserRepo: userRepo, AuthRepo: authRepo, JWTService: jwtService, Hashing: hashing}

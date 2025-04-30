@@ -1,7 +1,7 @@
 package database
 
 import (
-	"clonecoding/config"
+	"clonecoding/internal/config"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -22,6 +22,5 @@ func InitDatabase() {
 }
 
 func InitScheme(model interface{}) error {
-	// fmt.Println(models)
 	return database.AutoMigrate(&model)
 }
