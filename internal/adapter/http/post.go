@@ -20,10 +20,10 @@ func (p *PostHandler) CreatePost(c *gin.Context) {
 		Fail(c, http.StatusBadRequest, err.Error())
 	}
 
-	boardIdOrig := c.Param("boardId")
-	boardId, err := uuid.Parse(boardIdOrig)
-	if err != nil {
+	var uri dto.BoardUriDTO
+	if err := c.ShouldBindUri(&uri); err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	userIdOrig, exist := c.Get("userID")
@@ -38,7 +38,7 @@ func (p *PostHandler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	user, err := p.PostUsecase.CreatePost(&postDto, userId, boardId)
+	user, err := p.PostUsecase.CreatePost(&postDto, userId, uri.BoardId)
 	if err != nil {
 		Fail(c, http.StatusInternalServerError, err.Error())
 		return
@@ -58,15 +58,13 @@ func (p *PostHandler) GetAllPost(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostById(c *gin.Context) {
-	id := c.Param("id")
-
-	postId, err := uuid.Parse(id)
-	if err != nil {
+	var uri dto.PostUriDTO
+	if err := c.ShouldBindUri(&uri); err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostById(postId)
+	board, err := p.PostUsecase.FindPostById(uri.PostId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
@@ -76,15 +74,13 @@ func (p *PostHandler) GetPostById(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostByBoardId(c *gin.Context) {
-	id := c.Param("boardId")
-
-	boardId, err := uuid.Parse(id)
-	if err != nil {
+	var uri dto.BoardUriDTO
+	if err := c.ShouldBindUri(&uri); err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostByBoardId(boardId)
+	board, err := p.PostUsecase.FindPostByBoardId(uri.BoardId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
@@ -94,15 +90,13 @@ func (p *PostHandler) GetPostByBoardId(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostByUserId(c *gin.Context) {
-	id := c.Param("userId")
-
-	userId, err := uuid.Parse(id)
-	if err != nil {
+	var uri dto.UserUriDTO
+	if err := c.ShouldBindUri(&uri); err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostByUserId(userId)
+	board, err := p.PostUsecase.FindPostByUserId(uri.UserId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return

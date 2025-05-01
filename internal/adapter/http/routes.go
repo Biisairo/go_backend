@@ -27,15 +27,15 @@ func SetRouter(routerDeps *RouterDeps) *gin.Engine {
 	user := r.Group("/user")
 	user.Use(JWTMiddleware(routerDeps.JwtService))
 	user.GET("/", routerDeps.UserHandler.GetAllUser)
-	user.GET("/:id", routerDeps.UserHandler.GetUser)
-	user.GET("/post/:userId", routerDeps.PostHandler.GetPostByUserId) // get post data of specific user
+	user.GET("/:user_id", routerDeps.UserHandler.GetUser)
+	user.GET("/post/:user_id", routerDeps.PostHandler.GetPostByUserId) // get post data of specific user
 
 	board := r.Group("/board")
 	board.POST("/", routerDeps.BoardHandler.CreateBoard)
 	board.GET("/", routerDeps.BoardHandler.GetAllBoard)
-	board.GET("/:id", routerDeps.BoardHandler.GetBoard)                  // get specific board data
-	board.POST("/post/:boardId", routerDeps.PostHandler.CreatePost)      // get post data of specific board
-	board.GET("/post/:boardId", routerDeps.PostHandler.GetPostByBoardId) // get post data of specific board
+	board.GET("/:board_id", routerDeps.BoardHandler.GetBoard)             // get specific board data
+	board.POST("/post/:board_id", routerDeps.PostHandler.CreatePost)      // get post data of specific board
+	board.GET("/post/:board_id", routerDeps.PostHandler.GetPostByBoardId) // get post data of specific board
 
 	post := r.Group("/post")
 	post.GET("/", routerDeps.PostHandler.GetAllPost) // get all post data

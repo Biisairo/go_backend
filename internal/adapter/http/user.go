@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type UserHandler struct {
@@ -41,15 +40,13 @@ func (h *UserHandler) GetAllUser(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUser(c *gin.Context) {
-	id := c.Param("id")
-
-	userId, err := uuid.Parse(id)
-	if err != nil {
+	var uri dto.UserUriDTO
+	if err := c.ShouldBindUri(&uri); err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	user, err := h.UserUseCase.FindUserById(userId)
+	user, err := h.UserUseCase.FindUserById(uri.UserId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
