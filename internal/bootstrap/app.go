@@ -7,7 +7,6 @@ import (
 	"clonecoding/internal/adapter/jwt"
 	"clonecoding/internal/config"
 	"clonecoding/internal/domain"
-	"clonecoding/internal/router"
 	"clonecoding/internal/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +24,7 @@ func InitApp() *App {
 	database.InitScheme(domain.User{})
 	database.InitScheme(domain.RefreshToken{})
 	database.InitScheme(domain.Board{})
+	database.InitScheme(domain.Post{})
 
 	hashing := &hashing.HashingImpl{}
 
@@ -33,16 +33,26 @@ func InitApp() *App {
 	userRepo := &database.UserRepositoryImpl{DB: db}
 	authRepo := &database.AuthRepositoryImpl{DB: db}
 	boardRepo := &database.BoardRepositoryImpl{DB: db}
+	postRepo := &database.PostRepositoryImpl{DB: db}
 
 	userUsecase := &usecase.UserUsecase{UserRepo: userRepo, Hashing: hashing}
 	authUsecase := &usecase.AuthUseCase{UserRepo: userRepo, AuthRepo: authRepo, JWTService: jwtService, Hashing: hashing}
 	boardUsecase := &usecase.BoardUsecase{BoardRepo: boardRepo}
+	postUsecase := &usecase.PostUsecase{PostRepo: postRepo}
 
 	userHandler := &http.UserHandler{UserUseCase: userUsecase}
 	authHandler := &http.AuthHandler{AuthUseCase: authUsecase}
 	boardHandler := &http.BoardHandler{BoardUseCase: boardUsecase}
+	postHandler := &http.PostHandler{PostUsecase: postUsecase}
 
-	r := router.SetRouter(userHandler, authHandler, boardHandler, jwtService)
+	routerDeps := http.RouterDeps{
+		UserHandler:  userHandler,
+		AuthHandler:  authHandler,
+		BoardHandler: boardHandler,
+		PostHandler:  postHandler,
+		JwtService:   jwtService,
+	}
+	r := http.SetRouter(&routerDeps)
 
 	app := App{Engine: r}
 

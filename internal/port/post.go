@@ -7,8 +7,9 @@ import (
 )
 
 type PostRepository interface {
-	CreatePost(user *domain.User) error
-	FindAllUser() ([]*domain.User, error)
-	FindUserById(userId uuid.UUID) (*domain.User, error)
-	FindUserByEmail(email string) (*domain.User, error)
+	CreatePost(post *domain.Post) error
+	FindAllPost() ([]*domain.Post, error)
+	FindPostById(postId uuid.UUID) (*domain.Post, error)
+	FindPostByBoardId(boardId uuid.UUID) ([]*domain.Post, error)
+	FindPostByUserId(userId uuid.UUID) ([]*domain.Post, error)
 }

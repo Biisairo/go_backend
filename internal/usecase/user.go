@@ -36,10 +36,10 @@ func (u *UserUsecase) CreateUser(userDto dto.CreateUserDTO) (*domain.User, error
 	return &user, nil
 }
 
-func (u *UserUsecase) GetAllUsers() ([]*domain.User, error) {
+func (u *UserUsecase) FindAllUsers() ([]*domain.User, error) {
 	return u.UserRepo.FindAllUser()
 }
 
-func (u *UserUsecase) GetUserById(userId uuid.UUID) (*domain.User, error) {
+func (u *UserUsecase) FindUserById(userId uuid.UUID) (*domain.User, error) {
 	return u.UserRepo.FindUserById(userId)
 }
