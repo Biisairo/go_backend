@@ -5,6 +5,7 @@ import (
 	"clonecoding/internal/bootstrap"
 	"clonecoding/internal/config"
 	"encoding/json"
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -28,4 +29,9 @@ func ParseResponse(t *testing.T, res *httptest.ResponseRecorder) http.APIRespons
 		t.Fatalf("Invalid JSON: %v", err)
 	}
 	return body
+}
+
+func CkeckRedirectionLocation(res *httptest.ResponseRecorder) {
+	location := res.Header().Get("Location")
+	fmt.Printf("Redirected to: %s\n", location)
 }

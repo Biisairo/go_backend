@@ -20,25 +20,38 @@ func SetRouter(routerDeps *RouterDeps) *gin.Engine {
 	r.POST("/create", routerDeps.UserHandler.CreateUser)
 
 	auth := r.Group("/auth")
-	auth.POST("/login", routerDeps.AuthHandler.Login)
-	auth.POST("/refresh", routerDeps.AuthHandler.Refresh)
-	auth.POST("/logout", routerDeps.AuthHandler.Logout)
+	{
+		auth.POST("/login", routerDeps.AuthHandler.Login)
+		auth.POST("/refresh", routerDeps.AuthHandler.Refresh)
+		auth.POST("/logout", routerDeps.AuthHandler.Logout)
+	}
 
 	user := r.Group("/user")
-	user.Use(JWTMiddleware(routerDeps.JwtService))
-	user.GET("/", routerDeps.UserHandler.GetAllUser)
-	user.GET("/:user_id", routerDeps.UserHandler.GetUser)
-	user.GET("/post/:user_id", routerDeps.PostHandler.GetPostByUserId) // get post data of specific user
+	userAuth := user.Group("")
+	userAuth.Use(JWTMiddleware(routerDeps.JwtService))
+	{
+		userAuth.GET("/", routerDeps.UserHandler.GetAllUser)
+		userAuth.GET("/:user_id", routerDeps.UserHandler.GetUser)
+		userAuth.GET("/post/:user_id", routerDeps.PostHandler.GetPostByUserId) // get post data of specific user
+	}
 
 	board := r.Group("/board")
-	board.POST("/", routerDeps.BoardHandler.CreateBoard)
-	board.GET("/", routerDeps.BoardHandler.GetAllBoard)
-	board.GET("/:board_id", routerDeps.BoardHandler.GetBoard)             // get specific board data
-	board.POST("/post/:board_id", routerDeps.PostHandler.CreatePost)      // get post data of specific board
-	board.GET("/post/:board_id", routerDeps.PostHandler.GetPostByBoardId) // get post data of specific board
+	boardAuth := board.Group("")
+	boardAuth.Use(JWTMiddleware(routerDeps.JwtService))
+	{
+		boardAuth.POST("/", routerDeps.BoardHandler.CreateBoard)
+		boardAuth.GET("/", routerDeps.BoardHandler.GetAllBoard)
+		boardAuth.GET("/:board_id", routerDeps.BoardHandler.GetBoard)             // get specific board data
+		boardAuth.POST("/post/:board_id", routerDeps.PostHandler.CreatePost)      // get post data of specific board
+		boardAuth.GET("/post/:board_id", routerDeps.PostHandler.GetPostByBoardId) // get post data of specific board
+	}
 
 	post := r.Group("/post")
-	post.GET("/", routerDeps.PostHandler.GetAllPost) // get all post data
+	postAuth := post.Group("")
+	postAuth.Use(JWTMiddleware(routerDeps.JwtService))
+	{
+		postAuth.GET("/", routerDeps.PostHandler.GetAllPost) // get all post data
+	}
 
 	return r
 }

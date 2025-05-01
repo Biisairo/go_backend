@@ -3,6 +3,7 @@ package http
 import (
 	"clonecoding/internal/dto"
 	"clonecoding/internal/usecase"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,11 @@ func (p *PostHandler) CreatePost(c *gin.Context) {
 		Fail(c, http.StatusBadRequest, err.Error())
 	}
 
-	var uri dto.BoardUriDTO
-	if err := c.ShouldBindUri(&uri); err != nil {
+	fmt.Println("postDto: ", postDto)
+
+	id := c.Param("board_id")
+	boardId, err := uuid.Parse(id)
+	if err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -38,7 +42,7 @@ func (p *PostHandler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	user, err := p.PostUsecase.CreatePost(&postDto, userId, uri.BoardId)
+	user, err := p.PostUsecase.CreatePost(&postDto, userId, boardId)
 	if err != nil {
 		Fail(c, http.StatusInternalServerError, err.Error())
 		return
@@ -58,13 +62,14 @@ func (p *PostHandler) GetAllPost(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostById(c *gin.Context) {
-	var uri dto.PostUriDTO
-	if err := c.ShouldBindUri(&uri); err != nil {
+	id := c.Param("post_id")
+	postId, err := uuid.Parse(id)
+	if err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostById(uri.PostId)
+	board, err := p.PostUsecase.FindPostById(postId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
@@ -74,13 +79,14 @@ func (p *PostHandler) GetPostById(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostByBoardId(c *gin.Context) {
-	var uri dto.BoardUriDTO
-	if err := c.ShouldBindUri(&uri); err != nil {
+	id := c.Param("board_id")
+	boardId, err := uuid.Parse(id)
+	if err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostByBoardId(uri.BoardId)
+	board, err := p.PostUsecase.FindPostByBoardId(boardId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
@@ -90,13 +96,14 @@ func (p *PostHandler) GetPostByBoardId(c *gin.Context) {
 }
 
 func (p *PostHandler) GetPostByUserId(c *gin.Context) {
-	var uri dto.UserUriDTO
-	if err := c.ShouldBindUri(&uri); err != nil {
+	id := c.Param("user_id")
+	userId, err := uuid.Parse(id)
+	if err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := p.PostUsecase.FindPostByUserId(uri.UserId)
+	board, err := p.PostUsecase.FindPostByUserId(userId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return

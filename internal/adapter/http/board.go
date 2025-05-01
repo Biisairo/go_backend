@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type BoardHandler struct {
@@ -40,13 +41,14 @@ func (b *BoardHandler) GetAllBoard(c *gin.Context) {
 }
 
 func (b *BoardHandler) GetBoard(c *gin.Context) {
-	var uri dto.BoardUriDTO
-	if err := c.ShouldBindUri(&uri); err != nil {
+	id := c.Param("board_id")
+	boardId, err := uuid.Parse(id)
+	if err != nil {
 		Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	board, err := b.BoardUseCase.FindBoardById(uri.BoardId)
+	board, err := b.BoardUseCase.FindBoardById(boardId)
 	if err != nil {
 		Fail(c, http.StatusNotFound, err.Error())
 		return
