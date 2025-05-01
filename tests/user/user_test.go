@@ -1,15 +1,15 @@
-package tests
+package user_test
 
 import (
 	"clonecoding/internal/dto"
-	"fmt"
+	"clonecoding/tests"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
-	r := SetupTestEnv()
+	r := tests.SetupTestEnv()
 
 	users := GetTestUser()
 
@@ -25,7 +25,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestLoginCases(t *testing.T) {
-	r := SetupTestEnv()
+	r := tests.SetupTestEnv()
 
 	users := GetTestUser()
 
@@ -58,30 +58,14 @@ func TestLoginCases(t *testing.T) {
 			if res.Code != tc.expectStatus {
 				t.Errorf("[%s] Expected %d, got %d", tc.name, tc.expectStatus, res.Code)
 			}
-
-			// parsed := ParseResponse(t, res)
 		})
 	}
 }
 
 func TestGetUserWithValidToken(t *testing.T) {
-	r := SetupTestEnv()
+	r := tests.SetupTestEnv()
 
-	users := GetTestUser()
-	CreateUser(r, &users[0])
-	loginReq := dto.LoginRequest{
-		Email:    users[0].Email,
-		Password: users[0].Password,
-	}
-	loginRes := Login(r, &loginReq)
-	loginResParse := ParseResponse(t, loginRes)
-	dataOrig := loginResParse.Data
-	data, _ := dataOrig.(map[string]any)
-	tokenOrig := data["access_token"]
-	token, _ := tokenOrig.(string)
-	fmt.Println(token)
-
-	token = "Bearer " + token
+	token := GetToken(t, r)
 
 	req, _ := http.NewRequest("GET", "/user/", nil)
 	req.Header.Set("Authorization", token)

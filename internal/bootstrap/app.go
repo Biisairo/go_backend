@@ -17,8 +17,6 @@ type App struct {
 }
 
 func InitApp() *App {
-	config.LoadConfig()
-
 	database.InitDatabase()
 	db := database.GetDatabase()
 	database.InitScheme(domain.User{})

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -12,10 +13,10 @@ var (
 	JWTSecret    string
 )
 
-func LoadConfig() {
-	err := godotenv.Load()
+func LoadConfig(filePath string) {
+	err := godotenv.Load(filePath)
 	if err != nil {
-		panic("Fail to load .env")
+		panic(fmt.Sprintf("Failed to load env file at %s: %v", filePath, err))
 	}
 
 	Port = os.Getenv("PORT")

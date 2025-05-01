@@ -1,11 +1,14 @@
-package tests
+package user_test
 
 import (
 	"bytes"
 	"clonecoding/internal/dto"
+	"clonecoding/tests"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,4 +68,24 @@ func Login(r *gin.Engine, loginReq *dto.LoginRequest) *httptest.ResponseRecorder
 	r.ServeHTTP(res, req)
 
 	return res
+}
+
+func GetToken(t *testing.T, r *gin.Engine) string {
+	users := GetTestUser()
+	CreateUser(r, &users[0])
+	loginReq := dto.LoginRequest{
+		Email:    users[0].Email,
+		Password: users[0].Password,
+	}
+	loginRes := Login(r, &loginReq)
+	loginResParse := tests.ParseResponse(t, loginRes)
+	dataOrig := loginResParse.Data
+	data, _ := dataOrig.(map[string]any)
+	tokenOrig := data["access_token"]
+	token, _ := tokenOrig.(string)
+	fmt.Println(token)
+
+	token = "Bearer " + token
+
+	return token
 }
