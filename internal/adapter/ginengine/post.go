@@ -1,4 +1,4 @@
-package http
+package ginengine
 
 import (
 	"clonecoding/internal/dto"
@@ -32,13 +32,13 @@ func (p *PostHandler) CreatePost(c *gin.Context) {
 
 	userIdOrig, exist := c.Get("userID")
 	if !exist {
-		Fail(c, http.StatusInternalServerError, err.Error())
+		Fail(c, http.StatusInternalServerError, "jwt parsing error")
 		return
 	}
 
 	userId, ok := userIdOrig.(uuid.UUID)
 	if !ok {
-		Fail(c, http.StatusInternalServerError, err.Error())
+		Fail(c, http.StatusInternalServerError, "uuid parsing error")
 		return
 	}
 

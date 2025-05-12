@@ -2,8 +2,8 @@ package bootstrap
 
 import (
 	"clonecoding/internal/adapter/database"
+	"clonecoding/internal/adapter/ginengine"
 	"clonecoding/internal/adapter/hashing"
-	"clonecoding/internal/adapter/http"
 	"clonecoding/internal/adapter/jwt"
 	"clonecoding/internal/config"
 	"clonecoding/internal/domain"
@@ -38,19 +38,19 @@ func InitApp() *App {
 	boardUsecase := &usecase.BoardUsecase{BoardRepo: boardRepo}
 	postUsecase := &usecase.PostUsecase{PostRepo: postRepo}
 
-	userHandler := &http.UserHandler{UserUseCase: userUsecase}
-	authHandler := &http.AuthHandler{AuthUseCase: authUsecase}
-	boardHandler := &http.BoardHandler{BoardUseCase: boardUsecase}
-	postHandler := &http.PostHandler{PostUsecase: postUsecase}
+	userHandler := &ginengine.UserHandler{UserUseCase: userUsecase}
+	authHandler := &ginengine.AuthHandler{AuthUseCase: authUsecase}
+	boardHandler := &ginengine.BoardHandler{BoardUseCase: boardUsecase}
+	postHandler := &ginengine.PostHandler{PostUsecase: postUsecase}
 
-	routerDeps := http.RouterDeps{
+	routerDeps := ginengine.RouterDeps{
 		UserHandler:  userHandler,
 		AuthHandler:  authHandler,
 		BoardHandler: boardHandler,
 		PostHandler:  postHandler,
 		JwtService:   jwtService,
 	}
-	r := http.SetRouter(&routerDeps)
+	r := ginengine.SetRouter(&routerDeps)
 
 	app := App{Engine: r}
 

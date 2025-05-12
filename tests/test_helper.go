@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"clonecoding/internal/adapter/http"
+	"clonecoding/internal/adapter/ginengine"
 	"clonecoding/internal/bootstrap"
 	"clonecoding/internal/config"
 	"encoding/json"
@@ -22,8 +22,8 @@ func SetupTestEnv() *gin.Engine {
 	return app.Engine
 }
 
-func ParseResponse(t *testing.T, res *httptest.ResponseRecorder) http.APIResponse {
-	var body http.APIResponse
+func ParseResponse(t *testing.T, res *httptest.ResponseRecorder) ginengine.APIResponse {
+	var body ginengine.APIResponse
 	err := json.Unmarshal(res.Body.Bytes(), &body)
 	if err != nil {
 		t.Fatalf("Invalid JSON: %v", err)
